@@ -14,6 +14,7 @@
     <string name="button_discard">Discard</string>
     <!-- Label, button used to save a gesture newly created -->
     <string name="button_done">Done</string>
+    <string name="button_upload">Upload</string>
 
     <!-- Gestures -->
     <skip />

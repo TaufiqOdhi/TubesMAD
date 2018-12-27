@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "267177210164",
+    "firebase_url": "https://tubesmad.firebaseio.com",
+    "project_id": "tubesmad",
+    "storage_bucket": "tubesmad.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:267177210164:android:9b086090b2167c01",
+        "android_client_info": {
+          "package_name": "com.prakmad.tubesmad"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "267177210164-usgdjl4g5hosjhaeg66bhbpfpu6nkuv5.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.prakmad.tubesmad",
+            "certificate_hash": "8fac6602c3fc2eaeaaafbb2e69188a81c71be2d7"
+          }
+        },
+        {
+          "client_id": "267177210164-5osj957hjurcles14vtu7v0spv4kgp1u.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD8uPYJNZRm2hH5-0x3PLhySdCSwL_zmpw"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "267177210164-5osj957hjurcles14vtu7v0spv4kgp1u.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
     <ListView
@@ -38,6 +39,13 @@
             android:layout_weight="1"
             android:enabled="false"
             android:text="@string/button_reload" />
+        <Button
+            android:id="@+id/uploadButton"
+            android:onClick="uploadFile"
+            android:layout_width="0dip"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="@string/button_upload"/>
     </LinearLayout>
 
 </LinearLayout>

@@ -3,9 +3,12 @@ package com.prakmad.tubesmad;
 import android.app.Dialog;
 import android.app.AlertDialog;
 import android.app.ListActivity;
+import android.app.ProgressDialog;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.AsyncTask;
 import android.os.Environment;
+import android.support.annotation.NonNull;
 import android.view.View;
 import android.view.ContextMenu;
 import android.view.MenuItem;
@@ -28,6 +31,13 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.BitmapDrawable;
 
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.OnProgressListener;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.util.Map;
 import java.util.Collections;
 import java.util.HashMap;
@@ -42,7 +52,6 @@ public class GestureBuilderActivity extends ListActivity {
     private static final int STATUS_NOT_LOADED = 3;
     private static final int MENU_ID_RENAME = 1;
     private static final int MENU_ID_REMOVE = 2;
-    private static final int DIALOG_RENAME_GESTURE = 1;
     private static final int REQUEST_NEW_GESTURE = 1;
 
     // Type: long (id)
@@ -60,17 +69,70 @@ public class GestureBuilderActivity extends ListActivity {
     private Dialog mRenameDialog;
     private EditText mInput;
     private NamedGesture mCurrentRenameGesture;
+    private StorageReference mStorageRef;
+
+    //this method will upload the file
+    public void uploadFile(View v) {
+        Uri filePath = Uri.fromFile(mStoreFile);
+        //if there is a file to upload
+        if (filePath != null) {
+            //displaying a progress dialog while upload is going on
+            final ProgressDialog progressDialog = new ProgressDialog(this);
+            progressDialog.setTitle("Uploading");
+            progressDialog.show();
+
+            StorageReference riversRef = mStorageRef.child("gestures/gestures");
+            riversRef.putFile(filePath)
+                    .addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+                            //if the upload is successfull
+                            //hiding the progress dialog
+                            progressDialog.dismiss();
+
+                            //and displaying a success toast
+                            Toast.makeText(getApplicationContext(), "File Uploaded ", Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception exception) {
+                            //if the upload is not successfull
+                            //hiding the progress dialog
+                            progressDialog.dismiss();
+
+                            //and displaying error message
+                            Toast.makeText(getApplicationContext(), exception.getMessage(), Toast.LENGTH_LONG).show();
+                        }
+                    })
+                    .addOnProgressListener(new OnProgressListener<UploadTask.TaskSnapshot>() {
+                        @Override
+                        public void onProgress(UploadTask.TaskSnapshot taskSnapshot) {
+                            //calculating progress percentage
+                            double progress = (100.0 * taskSnapshot.getBytesTransferred()) / taskSnapshot.getTotalByteCount();
+
+                            //displaying percentage in progress dialog
+                            progressDialog.setMessage("Uploaded " + ((int) progress) + "%...");
+                        }
+                    });
+        }
+        //if there is not any file
+        else {
+            Toast.makeText(getApplicationContext(), "Belum membuat Gesture !", Toast.LENGTH_SHORT).show();
+        }
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.gestures_list);
+        mStorageRef = FirebaseStorage.getInstance().getReference();
         mAdapter = new GesturesAdapter(this);
         setListAdapter(mAdapter);
         if (sStore == null) {
             sStore = GestureLibraries.fromFile(mStoreFile);
         }
-        mEmpty = (TextView) findViewById(android.R.id.empty);
+        mEmpty = findViewById(android.R.id.empty);
         loadGestures();
         registerForContextMenu(getListView());
     }
@@ -161,36 +223,9 @@ public class GestureBuilderActivity extends ListActivity {
         final AdapterView.AdapterContextMenuInfo menuInfo = (AdapterView.AdapterContextMenuInfo)
                 item.getMenuInfo();
         final NamedGesture gesture = (NamedGesture) menuInfo.targetView.getTag();
-        switch (item.getItemId()) {
-            case MENU_ID_RENAME:
-                renameGesture(gesture);
-                return true;
-            case MENU_ID_REMOVE:
-                deleteGesture(gesture);
-                return true;
-        }
         return super.onContextItemSelected(item);
     }
-    private void renameGesture(NamedGesture gesture) {
-        mCurrentRenameGesture = gesture;
-        showDialog(DIALOG_RENAME_GESTURE);
-    }
 
-    @Override
-    protected Dialog onCreateDialog(int id) {
-        if (id == DIALOG_RENAME_GESTURE) {
-            return createRenameDialog();
-        }
-        return super.onCreateDialog(id);
-    }
-
-    @Override
-    protected void onPrepareDialog(int id, Dialog dialog) {
-        super.onPrepareDialog(id, dialog);
-        if (id == DIALOG_RENAME_GESTURE) {
-            mInput.setText(mCurrentRenameGesture.name);
-        }
-    }
     private Dialog createRenameDialog() {
         final View layout = View.inflate(this, R.layout.dialog_rename, null);
         mInput = (EditText) layout.findViewById(R.id.name);
